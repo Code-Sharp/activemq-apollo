@@ -760,9 +760,14 @@ class BrokerResource() extends Resource {
     rc.entry = entry
 
     if( max_body > 0 ) {
-      val body = delivery.message.getBodyAs(classOf[Buffer])
+      var body = delivery.message.getBodyAs(classOf[Buffer])
       if( body.length > max_body) {
+        val oldLength = body.length
+        val oldBody = body
         body.length = max_body
+        body = body.deepCopy
+        oldBody.length = oldLength
+        
         rc.body_truncated = true
       }
       rc.base64_body = base64(body)
